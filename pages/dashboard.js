@@ -1,9 +1,10 @@
 import RewardCard from '../components/RewardCard';
+import withAuth from '../hoc/withAuth';
 import RewardMemberModal from '../components/RewardMemberModal';
 import AddMemberModal from '../components/AddMemberModal';
 import { useState, useEffect } from 'react';
 
-export default function Dashboard() {
+function Dashboard() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [filteredMembers, setFilteredMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -165,3 +166,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+export default withAuth(Dashboard)
