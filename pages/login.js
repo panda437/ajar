@@ -18,16 +18,16 @@ export default function Login() {
     setError(null);
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
 
-      // Save user in AuthContext
+      // Save session to AuthContext
       login(data);
 
       // Redirect to dashboard
@@ -38,29 +38,46 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md">
-        <h2 className="text-xl font-bold mb-4">Log In</h2>
-        {error && <p className="text-red-500 mb-2">{error}</p>}
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full p-2 border rounded mb-4"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="w-full p-2 border rounded mb-4"
-        />
-        <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+    <div className="min-h-screen flex justify-center items-center bg-gray-100">
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-sm">
+        <h2 className="text-2xl font-bold mb-6 text-center">Log In</h2>
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2">Email</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter your email"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2">Password</label>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+        >
           Log In
         </button>
+        <p className="text-sm text-center mt-4">
+          Don’t have an account?{' '}
+          <a href="/signup" className="text-blue-500 hover:underline">
+            Sign up
+          </a>
+        </p>
       </form>
     </div>
   );

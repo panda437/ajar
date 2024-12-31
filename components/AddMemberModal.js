@@ -5,8 +5,9 @@ export default function AddMemberModal({ isOpen, onClose, onMemberAdded }) {
     name: '',
     email: '',
     phone: '',
-    coins: 0,
-    diamonds: 0,
+    password: '',
+    company: '',
+    team: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -32,14 +33,17 @@ export default function AddMemberModal({ isOpen, onClose, onMemberAdded }) {
       const result = await response.json();
       console.log('Member added:', result);
 
+      // Reset form data
       setFormData({
         name: '',
         email: '',
         phone: '',
-        coins: 0,
-        diamonds: 0,
+        password: '',
+        company: '',
+        team: '',
       });
 
+      // Notify parent component
       onMemberAdded();
       onClose();
     } catch (error) {
@@ -85,6 +89,34 @@ export default function AddMemberModal({ isOpen, onClose, onMemberAdded }) {
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               className="w-full p-2 border rounded"
               required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">Password:</label>
+            <input
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">Company:</label>
+            <input
+              type="text"
+              value={formData.company}
+              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">Team:</label>
+            <input
+              type="text"
+              value={formData.team}
+              onChange={(e) => setFormData({ ...formData, team: e.target.value })}
+              className="w-full p-2 border rounded"
             />
           </div>
           <div className="flex gap-4">

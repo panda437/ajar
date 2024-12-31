@@ -119,8 +119,8 @@ function Dashboard() {
                 {(filteredMembers || []).map((member) => (
                   <tr key={member._id} className="border-b">
                     <td className="py-2 px-4">{member.name || ''}</td>
-                    <td className="py-2 px-4">{member.coins || 0}</td>
-                    <td className="py-2 px-4">{member.diamonds || 0}</td>
+                    <td className="py-2 px-4">{member.points?.coins || 0}</td>
+                    <td className="py-2 px-4">{member.points?.diamonds || 0}</td>
                     <td className="py-2 px-4">
                       <button
                         className="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded"
@@ -144,12 +144,12 @@ function Dashboard() {
       {/* Reward Modal */}
       {isRewardModalOpen && selectedMember && (
         <RewardMemberModal
-          isOpen={isRewardModalOpen}
-          onClose={() => setIsRewardModalOpen(false)}
-          // Pass in the member's ID and name
-          recipientId={selectedMember._id}
-          memberName={selectedMember.name}
-        />
+        isOpen={isRewardModalOpen}
+        onClose={() => setIsRewardModalOpen(false)}
+        recipientId={selectedMember._id}
+        memberName={selectedMember.name}
+        refreshMembers={getMembers} // Pass the function to refresh members
+      />
       )}
 
       {/* Add Member Modal */}
@@ -167,4 +167,4 @@ function Dashboard() {
   );
 }
 
-export default withAuth(Dashboard)
+export default withAuth(Dashboard);

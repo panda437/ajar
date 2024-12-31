@@ -5,8 +5,8 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
-  // Load user from localStorage on initial load
   useEffect(() => {
+    // Check for a stored session on app load
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -30,7 +30,6 @@ export function AuthProvider({ children }) {
   );
 }
 
-// Hook for easy access to AuthContext
 export function useAuth() {
   return useContext(AuthContext);
 }

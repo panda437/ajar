@@ -1,41 +1,60 @@
-import { ObjectId } from 'mongodb';
 import { connectToDatabase } from '../../lib/mongodb';
+import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
-  if (req.method === 'GET') {
-    return getTransactions(req, res);
-  } else {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
-}
-
-// Fetch transactions and join sender/recipient names
-async function getTransactions(req, res) {
   try {
-    const { db } = await connectToDatabase();
-    const transactionsColl = db.collection('transactions');
-    const membersColl = db.collection('members');
+    console.log('Request method:', req.method);
 
-    // Fetch all transactions
-    const transactions = await transactionsColl.find({}).toArray();
+    if (req.method === 'POST') {
+      const { recipientId, currencyType, amount, message } = req.body;
 
-    // Fetch all member data for mapping IDs to names
-    const members = await membersColl.find({}).toArray();
-    const memberMap = {};
-    members.forEach((member) => {
-      memberMap[member._id.toString()] = member.name; // Create a map of ID -> Name
-    });
+      console.log('Request body:', req.body);
 
-    // Replace IDs with names
-    const enhancedTransactions = transactions.map((tx) => ({
-      ...tx,
-      recipientName: memberMap[tx.recipientId?.toString()] || 'Unknown Recipient',
-      senderName: memberMap[tx.senderId?.toString()] || 'System',
-    }));
+      // Validate input
+      if (!recipientId || !currencyType || !amount) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
 
-    res.status(200).json(enhancedTransactions);
+      const { db } = await connectToDatabase();
+      const membersCollection = db.collection('members');
+      const transactionsCollection = db.collection('transactions');
+
+      // 1. Validate recipient exists
+      const recipient = await membersCollection.findOne({ _id: new ObjectId(recipientId) });
+      if (!recipient) {
+        console.error('Recipient not found:', recipientId);
+        return res.status(404).json({ message: 'Recipient not found' });
+      }
+
+      console.log('Recipient found:', recipient);
+
+      // 2. Create transaction
+      const transaction = {
+        recipientId: new ObjectId(recipientId),
+        currencyType,
+        amount: parseInt(amount, 10),
+        message,
+        timestamp: new Date(),
+      };
+
+      const result = await transactionsCollection.insertOne(transaction);
+      console.log('Transaction created:', result);
+
+      // 3. Update recipient's points
+      const pointsField = currencyType === 'coins' ? 'points.coins' : 'points.diamonds';
+      const updateResult = await membersCollection.updateOne(
+        { _id: new ObjectId(recipientId) },
+        { $inc: { [pointsField]: transaction.amount } }
+      );
+      console.log('Recipient points updated:', updateResult);
+
+      return res.status(201).json({ message: 'Transaction successful', transactionId: result.insertedId });
+    }
+
+    res.setHeader('Allow', ['POST']);
+    res.status(405).json({ message: `Method ${req.method} Not Allowed` });
   } catch (error) {
-    console.error('GET /api/transactions error:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error('Internal Server Error:', error.message);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 }
