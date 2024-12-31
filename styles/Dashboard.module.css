@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .dashboard-container {
     padding: 20px;
     background-color: #f4f4f9;
