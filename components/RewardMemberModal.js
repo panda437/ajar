@@ -16,22 +16,20 @@ export default function RewardMemberModal({ isOpen, onClose, recipientId, member
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          senderId: 'managerId123', // Replace with actual senderId
           recipientId,
           currencyType,
           amount: parseInt(amount, 10),
           message,
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to add reward');
       }
-
-      // Refresh the members list after successfully adding a reward
-      refreshMembers();
-
-      // Close the modal
-      onClose();
+  
+      refreshMembers(); // Refresh members to reflect updated balances
+      onClose(); // Close the modal
     } catch (err) {
       console.error('Error adding reward:', err);
       alert(err.message);

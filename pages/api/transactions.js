@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     console.log('Request method:', req.method);
 
     if (req.method === 'POST') {
-      const { recipientId, currencyType, amount, message } = req.body;
+      const { senderId, recipientId, currencyType, amount, message } = req.body;
 
       console.log('Request body:', req.body);
 
@@ -26,10 +26,29 @@ export default async function handler(req, res) {
         return res.status(404).json({ message: 'Recipient not found' });
       }
 
-      console.log('Recipient found:', recipient);
+      // 2. If senderId is provided, validate sender and deduct from "give" balance
+      if (senderId) {
+        const sender = await membersCollection.findOne({ _id: new ObjectId(senderId) });
+        if (!sender) {
+          console.error('Sender not found:', senderId);
+          return res.status(404).json({ message: 'Sender not found' });
+        }
 
-      // 2. Create transaction
+        const giveField = currencyType === 'coins' ? 'points.giveCoins' : 'points.giveDiamonds';
+
+        if (sender.points[giveField] < amount) {
+          return res.status(400).json({ message: `Not enough ${currencyType} to reward` });
+        }
+
+        await membersCollection.updateOne(
+          { _id: new ObjectId(senderId) },
+          { $inc: { [giveField]: -amount } }
+        );
+      }
+
+      // 3. Create transaction
       const transaction = {
+        senderId: senderId ? new ObjectId(senderId) : null,
         recipientId: new ObjectId(recipientId),
         currencyType,
         amount: parseInt(amount, 10),
@@ -40,8 +59,8 @@ export default async function handler(req, res) {
       const result = await transactionsCollection.insertOne(transaction);
       console.log('Transaction created:', result);
 
-      // 3. Update recipient's points
-      const pointsField = currencyType === 'coins' ? 'points.coins' : 'points.diamonds';
+      // 4. Update recipient's points
+      const pointsField = currencyType === 'coins' ? 'points.myCoins' : 'points.myDiamonds';
       const updateResult = await membersCollection.updateOne(
         { _id: new ObjectId(recipientId) },
         { $inc: { [pointsField]: transaction.amount } }

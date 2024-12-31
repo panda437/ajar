@@ -59,8 +59,10 @@ export default async function handler(req, res) {
         role: 'Employee', // Default role
         team: team || null, // Optional team
         points: {
-          coins: 0,
-          diamonds: 0,
+          myCoins: 0,
+          myDiamonds: 0,
+          giveCoins: 0,
+          giveDiamonds: 0,
         },
         company,
         createdAt: new Date(),
