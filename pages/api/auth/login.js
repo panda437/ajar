@@ -35,6 +35,7 @@ export default async function handler(req, res) {
         message: 'Login successful',
         userId: user._id,
         name: user.name,
+        email: user.email, // Include email here
       });
     } catch (error) {
       console.error('Login error:', error);

@@ -2,23 +2,25 @@ import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-function withAuth(Component) {
+export default function withAuth(Component) {
   return function AuthenticatedComponent(props) {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
-      if (!user) {
-        router.push('/login'); // Redirect to login if not logged in
+      if (!loading && !user) {
+        router.push('/login'); // Redirect if not logged in
       }
-    }, [user]);
+    }, [loading, user]);
+
+    if (loading) {
+      return <p>Loading...</p>; // Show a loader while checking auth
+    }
 
     if (!user) {
-      return <p>Loading...</p>;
+      return null; // Prevent rendering until redirect happens
     }
 
     return <Component {...props} />;
   };
 }
-
-export default withAuth;

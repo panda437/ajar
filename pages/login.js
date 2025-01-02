@@ -29,6 +29,7 @@ export default function Login() {
 
       // Save session to AuthContext
       login(data);
+      console.log('Login response data:', data);
 
       // Redirect to dashboard
       router.push('/dashboard');

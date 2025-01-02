@@ -1,8 +1,10 @@
+import React from 'react';
 import RewardCard from '../components/RewardCard';
-import withAuth from '../hoc/withAuth';
+
 import RewardMemberModal from '../components/RewardMemberModal';
 import AddMemberModal from '../components/AddMemberModal';
 import { useState, useEffect } from 'react';
+import withAuth from '../hoc/withAuth';
 
 function Dashboard() {
   const [teamMembers, setTeamMembers] = useState([]);
@@ -107,35 +109,38 @@ function Dashboard() {
         ) : (
           <div className="overflow-x-auto bg-white shadow-md rounded">
             <table className="min-w-full text-left">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="py-2 px-4">Name</th>
-                  <th className="py-2 px-4">Coins</th>
-                  <th className="py-2 px-4">Diamonds</th>
-                  <th className="py-2 px-4">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(filteredMembers || []).map((member) => (
-                  <tr key={member._id} className="border-b">
-                    <td className="py-2 px-4">{member.name || ''}</td>
-                    <td className="py-2 px-4">{member.points?.coins || 0}</td>
-                    <td className="py-2 px-4">{member.points?.diamonds || 0}</td>
-                    <td className="py-2 px-4">
-                      <button
-                        className="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded"
-                        onClick={() => {
-                          // Store the entire member object so we can access their _id
-                          setSelectedMember(member);
-                          setIsRewardModalOpen(true);
-                        }}
-                      >
-                        Reward
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+            <thead className="bg-gray-100">
+  <tr>
+    <th className="py-2 px-4">Name</th>
+    <th className="py-2 px-4">My Coins</th>
+    <th className="py-2 px-4">My Diamonds</th>
+    <th className="py-2 px-4">Give Coins</th>
+    <th className="py-2 px-4">Give Diamonds</th>
+    <th className="py-2 px-4">Action</th>
+  </tr>
+</thead>
+<tbody>
+  {(filteredMembers || []).map((member) => (
+    <tr key={member._id} className="border-b">
+      <td className="py-2 px-4">{member.name || ''}</td>
+      <td className="py-2 px-4">{member.points?.myCoins || 0}</td>
+      <td className="py-2 px-4">{member.points?.myDiamonds || 0}</td>
+      <td className="py-2 px-4">{member.points?.giveCoins || 0}</td>
+      <td className="py-2 px-4">{member.points?.giveDiamonds || 0}</td>
+      <td className="py-2 px-4">
+        <button
+          className="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded"
+          onClick={() => {
+            setSelectedMember(member);
+            setIsRewardModalOpen(true);
+          }}
+        >
+          Reward
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
             </table>
           </div>
         )}

@@ -25,6 +25,25 @@ export default async function handler(req, res) {
 
     // ---- Handle GET (list members) ----
     if (req.method === 'GET') {
+      const { email, id } = req.query;
+    
+      if (email) {
+        const member = await collection.findOne({ email });
+        if (!member) {
+          return res.status(404).json({ message: 'Member not found' });
+        }
+        return res.status(200).json(member);
+      }
+    
+      if (id) {
+        const member = await collection.findOne({ _id: new ObjectId(id) });
+        if (!member) {
+          return res.status(404).json({ message: 'Member not found' });
+        }
+        return res.status(200).json(member);
+      }
+    
+      // If no query, return all members
       const members = await collection.find({}).toArray();
       return res.status(200).json(members);
     }
